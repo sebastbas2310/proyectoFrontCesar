@@ -28,6 +28,9 @@ export default function Dashboard() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [expensesByCategory, setExpensesByCategory] = useState<{
+    [key: string]: any[];
+  }>({});
 
   // Obtener el email del usuario autenticado
   useEffect(() => {
@@ -96,9 +99,12 @@ export default function Dashboard() {
     if (!categories.length) return;
 
     const fetchExpensesForAllCategories = async () => {
+      const allExpenses: { [key: string]: any[] } = {};
+
       for (const category of categories) {
         try {
           const res = await getExpensesByCategoryId(category.id);
+          allExpenses[category.id] = res.data || [];
           console.log(
             `Expenses para la categoría "${category.name}" (${category.id}):`,
             res.data
@@ -110,6 +116,8 @@ export default function Dashboard() {
           );
         }
       }
+
+      setExpensesByCategory(allExpenses);
     };
 
     fetchExpensesForAllCategories();
@@ -259,6 +267,13 @@ export default function Dashboard() {
                   >
                     ⚙️
                   </button>
+                  <ul className="ml-4 mt-2 text-sm text-gray-700">
+                    {(expensesByCategory[category.id] || []).map((expense) => (
+                      <li key={expense.expense_id}>
+                        {expense.name} - ${expense.amount}
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               );
             })}
