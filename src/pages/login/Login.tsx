@@ -26,12 +26,15 @@ const Login = () => {
 
       if (response.data.token) {
         localStorage.setItem("AuthToken", response.data.token);
+        if (response.data.user) {
+          localStorage.setItem("AuthUser", JSON.stringify(response.data.user));
+          console.log('Usuario autenticado en frontend:', response.data.user);
+        }
         Swal.fire({
           title: "¡Inicio de sesión exitoso!",
           text: "Bienvenido de nuevo.",
           icon: "success",
-        });
-        navigate("/dashboard");
+        }).then(() => navigate("/dashboard"));
         return;
       }
 
@@ -53,13 +56,28 @@ const Login = () => {
   const onRegister = async (data: LoginForm) => {
     try {
       // Envía los datos al backend (el backend se encarga de encriptar la contraseña)
-      await registerUser({
+      const response = await registerUser({
         user_name: data.email.split("@")[0], // O pide un campo nombre si lo necesitas
         email: data.email,
         password: data.password,
         phone_number: data.phone || undefined,
         user_status: "Activo", // O lo que corresponda
       });
+
+      // Si el backend devuelve token y usuario, iniciar sesión automáticamente
+      if (response.data.token) {
+        localStorage.setItem("AuthToken", response.data.token);
+        if (response.data.user) {
+          localStorage.setItem("AuthUser", JSON.stringify(response.data.user));
+          console.log('Usuario registrado y autenticado en frontend:', response.data.user);
+        }
+        Swal.fire({
+          title: "Cuenta creada",
+          text: "Bienvenido.",
+          icon: "success",
+        }).then(() => navigate("/dashboard"));
+        return;
+      }
 
       Swal.fire({
         title: "Cuenta creada",

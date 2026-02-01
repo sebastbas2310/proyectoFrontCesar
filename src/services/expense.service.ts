@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Cambia si tu backend está en otro puerto o dominio
-const BASE_URL = "http://localhost:3000/expense";
+const BASE_URL = "http://localhost:3000/expenses";
 
 // Interfaces (ajusta si tu modelo cambia)
 export interface Expense {
